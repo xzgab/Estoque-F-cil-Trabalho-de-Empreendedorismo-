@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque Fácil — Controle de Estoque e Preço Justo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="logo">📦</span>
+            <div>
+                <h1>Estoque Fácil</h1>
+                <p class="tagline">Controle de estoque + calculadora de preço justo</p>
+            </div>
+        </div>
+        <nav class="tabs" id="tabs">
+            <button class="tab active" data-tab="dashboard">Dashboard</button>
+            <button class="tab" data-tab="estoque">Estoque</button>
+            <button class="tab" data-tab="calculadora">Calculadora</button>
+            <button class="tab" data-tab="config">Configurações</button>
+        </nav>
+    </header>
+
+    <main class="container">
+
+        <!-- ===================== DASHBOARD ===================== -->
+        <section class="panel active" id="panel-dashboard">
+            <h2>Resumo da loja</h2>
+            <div class="cards" id="cards"></div>
+
+            <div class="grid-2">
+                <div class="box">
+                    <h3>Alertas de estoque baixo</h3>
+                    <ul class="alert-list" id="lista-alertas"></ul>
+                </div>
+                <div class="box">
+                    <h3>Valor por categoria</h3>
+                    <ul class="alert-list" id="lista-categorias"></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== ESTOQUE ===================== -->
+        <section class="panel" id="panel-estoque">
+            <div class="panel-head">
+                <h2>Produtos</h2>
+                <div class="head-actions">
+                    <input type="search" id="busca" placeholder="Buscar por nome, SKU ou categoria...">
+                    <select id="filtro-categoria">
+                        <option value="">Todas as categorias</option>
+                    </select>
+                    <select id="filtro-status">
+                        <option value="">Todos os status</option>
+                        <option value="ok">Estoque OK</option>
+                        <option value="baixo">Estoque baixo</option>
+                        <option value="zerado">Zerado</option>
+                    </select>
+                    <button class="btn primary" id="btn-novo">+ Novo produto</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Produto</th>
+                            <th>Categoria</th>
+                            <th class="num">Qtd</th>
+                            <th class="num">Custo</th>
+                            <th class="num">Preço venda</th>
+                            <th class="num">Margem</th>
+                            <th class="num">Valor total</th>
+                            <th>Status</th>
+                            <th class="acoes">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-produtos"></tbody>
+                </table>
+                <p class="vazio" id="vazio-tabela" hidden>Nenhum produto encontrado.</p>
+            </div>
+        </section>
+
+        <!-- ===================== CALCULADORA ===================== -->
+        <section class="panel" id="panel-calculadora">
+            <h2>Calculadora de preço justo</h2>
+            <p class="sub">Calcula o preço de venda a partir do custo, cobrindo impostos, taxas de cartão, frete e despesas — com a margem de lucro que você escolher.</p>
+
+            <div class="grid-2 calc">
+                <div class="box">
+                    <h3>Dados do produto</h3>
+                    <div class="form-grid">
+                        <label>Nome do produto
+                            <input type="text" id="c-nome" placeholder="Ex: Fone bluetooth">
+                        </label>
+                        <label>Custo unitário (R$)
+                            <input type="number" id="c-custo" min="0" step="0.01" value="0">
+                        </label>
+                        <label>Quantidade comprada
+                            <input type="number" id="c-qtd" min="1" step="1" value="1">
+                        </label>
+                        <label>Frete / despesas por lote (R$)
+                            <input type="number" id="c-frete" min="0" step="0.01" value="0">
+                        </label>
+                        <label>Outros custos por unidade (R$)
+                            <input type="number" id="c-outros" min="0" step="0.01" value="0">
+                        </label>
+                    </div>
+
+                    <h3>Encargos sobre a venda</h3>
+                    <div class="form-grid">
+                        <label>Imposto (%)
+                            <input type="number" id="c-imposto" min="0" step="0.01" value="6">
+                        </label>
+                        <label>Comissão de marketplace (%)
+                            <input type="number" id="c-comissao" min="0" step="0.01" value="0">
+                        </label>
+                        <label>Taxa de cartão (%)
+                            <input type="number" id="c-cartao" min="0" step="0.01" value="3">
+                        </label>
+                        <label>Taxa fixa por venda (R$)
+                            <input type="number" id="c-fixataxa" min="0" step="0.01" value="0">
+                        </label>
+                    </div>
+
+                    <h3>Lucro desejado</h3>
+                    <div class="form-grid">
+                        <label>Margem desejada (%)
+                            <input type="number" id="c-margem" min="0" max="90" step="0.5" value="30">
+                        </label>
+                        <label class="check-label">
+                            <input type="checkbox" id="c-margem-custo" checked>
+                            Margem sobre o custo total
+                        </label>
+                    </div>
+                </div>
+
+                <div class="box result-box">
+                    <h3>Resultado</h3>
+                    <div class="preco-destaque">
+                        <span class="label">Preço de venda sugerido</span>
+                        <strong id="r-preco">R$ 0,00</strong>
+                        <span class="arredondado" id="r-preco-psicologico"></span>
+                    </div>
+
+                    <ul class="detalhe" id="r-detalhe"></ul>
+
+                    <div class="result-actions">
+                        <button class="btn primary" id="btn-salvar-calc">Salvar como produto</button>
+                        <button class="btn ghost" id="btn-limpar-calc">Limpar</button>
+                    </div>
+
+                    <details class="faixa">
+                        <summary>Ver faixa de preços sugerida</summary>
+                        <table class="tabela mini">
+                            <thead>
+                                <tr><th>Margem</th><th class="num">Preço</th><th class="num">Lucro/un.</th></tr>
+                            </thead>
+                            <tbody id="tbody-faixa"></tbody>
+                        </table>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== CONFIGURAÇÕES ===================== -->
+        <section class="panel" id="panel-config">
+            <h2>Configurações da loja</h2>
+            <p class="sub">Estes valores são usados como padrão na calculadora e nos alertas.</p>
+            <div class="box">
+                <div class="form-grid">
+                    <label>Imposto padrão (%)
+                        <input type="number" id="cfg-imposto" min="0" step="0.01">
+                    </label>
+                    <label>Taxa de cartão padrão (%)
+                        <input type="number" id="cfg-cartao" min="0" step="0.01">
+                    </label>
+                    <label>Comissão de marketplace padrão (%)
+                        <input type="number" id="cfg-comissao" min="0" step="0.01">
+                    </label>
+                    <label>Margem padrão (%)
+                        <input type="number" id="cfg-margem" min="0" max="90" step="0.5">
+                    </label>
+                    <label>Estoque mínimo padrão (unidades)
+                        <input type="number" id="cfg-minimo" min="0" step="1">
+                    </label>
+                </div>
+                <div class="result-actions">
+                    <button class="btn primary" id="btn-salvar-cfg">Salvar configurações</button>
+                    <button class="btn ghost" id="btn-exportar">Exportar JSON</button>
+                    <button class="btn ghost" id="btn-importar">Importar JSON</button>
+                    <button class="btn danger" id="btn-limpar-tudo">Apagar todos os dados</button>
+                    <input type="file" id="input-importar" accept="application/json" hidden>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="rodape">
+        <span>Estoque Fácil · dados salvos no seu navegador (localStorage)</span>
+    </footer>
+
+    <!-- ===================== MODAL PRODUTO ===================== -->
+    <div class="modal" id="modal" hidden>
+        <div class="modal-card">
+            <header class="modal-head">
+                <h3 id="modal-titulo">Novo produto</h3>
+                <button class="fechar" id="modal-fechar" aria-label="Fechar">&times;</button>
+            </header>
+            <form id="form-produto" class="form-grid">
+                <input type="hidden" id="f-id">
+                <label>Nome do produto *
+                    <input type="text" id="f-nome" required placeholder="Ex: Camiseta básica">
+                </label>
+                <label>SKU / Código
+                    <input type="text" id="f-sku" placeholder="Ex: CAM-001">
+                </label>
+                <label>Categoria
+                    <input type="text" id="f-categoria" list="lista-categorias-dl" placeholder="Ex: Vestuário">
+                    <datalist id="lista-categorias-dl"></datalist>
+                </label>
+                <label>Fornecedor
+                    <input type="text" id="f-fornecedor" placeholder="Opcional">
+                </label>
+                <label>Quantidade em estoque *
+                    <input type="number" id="f-qtd" min="0" step="1" value="0" required>
+                </label>
+                <label>Estoque mínimo
+                    <input type="number" id="f-minimo" min="0" step="1" value="5">
+                </label>
+                <label>Custo unitário (R$) *
+                    <input type="number" id="f-custo" min="0" step="0.01" value="0" required>
+                </label>
+                <label>Preço de venda (R$) *
+                    <input type="number" id="f-preco" min="0" step="0.01" value="0" required>
+                </label>
+                <label class="full">Observações
+                    <textarea id="f-obs" rows="2" placeholder="Opcional"></textarea>
+                </label>
+
+                <div class="calc-hint full">
+                    <button type="button" class="btn ghost" id="btn-usar-calc">Calcular preço justo para este produto</button>
+                </div>
+
+                <div class="modal-actions full">
+                    <button type="button" class="btn ghost" id="modal-cancelar">Cancelar</button>
+                    <button type="submit" class="btn primary">Salvar produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
